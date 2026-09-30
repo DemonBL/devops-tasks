@@ -1,0 +1,11 @@
+Release "{{ .Release.Name }}" of chart {{ .Chart.Name }} deployed to namespace "{{ .Release.Namespace }}".
+Image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+Replicas: {{ .Values.replicaCount }}
+
+Access the app:
+{{- if eq .Values.service.type "NodePort" }}
+  minikube service {{ include "hello-chart.fullname" . }} -n {{ .Release.Namespace }}
+{{- else }}
+  kubectl port-forward svc/{{ include "hello-chart.fullname" . }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  Then open http://localhost:8080
+{{- end }}

@@ -1,0 +1,60 @@
+services:
+
+  concourse-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: concourse
+      POSTGRES_USER: concourse
+      POSTGRES_PASSWORD: concourse
+    volumes:
+      - concourse-db:/var/lib/postgresql/data
+
+  concourse-web:
+    image: concourse/concourse:latest
+    command: web
+    depends_on:
+      - concourse-db
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keys:/concourse-keys:ro
+    environment:
+      CONCOURSE_POSTGRES_HOST: concourse-db
+      CONCOURSE_POSTGRES_USER: concourse
+      CONCOURSE_POSTGRES_PASSWORD: concourse
+      CONCOURSE_POSTGRES_DATABASE: concourse
+
+      CONCOURSE_EXTERNAL_URL: http://localhost:8080
+
+      CONCOURSE_ADD_LOCAL_USER: admin:admin
+      CONCOURSE_MAIN_TEAM_LOCAL_USER: admin
+
+      CONCOURSE_SESSION_SIGNING_KEY: /concourse-keys/session_signing_key
+      CONCOURSE_TSA_HOST_KEY: /concourse-keys/tsa_host_key
+      CONCOURSE_TSA_AUTHORIZED_KEYS: /concourse-keys/worker_key.pub
+
+  concourse-worker:
+    image: concourse/concourse:latest
+    command: worker
+    privileged: true
+    depends_on:
+      - concourse-web
+    volumes:
+      - ./keys:/concourse-keys:ro
+      - worker-state:/worker-state
+    environment:
+      CONCOURSE_NAME: local-worker
+
+      CONCOURSE_TSA_HOST: concourse-web:2222
+      CONCOURSE_TSA_PUBLIC_KEY: /concourse-keys/tsa_host_key.pub
+      CONCOURSE_TSA_WORKER_PRIVATE_KEY: /concourse-keys/worker_key
+
+      CONCOURSE_BAGGAGECLAIM_DRIVER: overlay
+
+      CONCOURSE_CONTAINERD_DNS_SERVER: "1.1.1.1,8.8.8.8"
+      CONCOURSE_CONTAINERD_DNS_PROXY_ENABLE: "true"
+      CONCOURSE_CONTAINERD_ALLOW_HOST_ACCESS: "true"
+
+volumes:
+  concourse-db:
+  worker-state:

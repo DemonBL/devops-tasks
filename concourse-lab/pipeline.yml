@@ -1,0 +1,19 @@
+jobs:
+  - name: hello-world
+    plan:
+      - task: hello-world
+        config:
+          platform: linux
+
+          image_resource:
+            type: registry-image
+            source:
+              repository: bash
+              tag: latest
+
+          run:
+            path: bash
+            args:
+              - -c
+              - |
+                echo "hello world"

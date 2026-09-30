@@ -1,0 +1,81 @@
+# Імена ресурсів
+nameOverride: ""
+fullnameOverride: ""
+
+# Кількість подів
+replicaCount: 2
+revisionHistoryLimit: 3
+
+# Образ
+image:
+  repository: nginxdemos/hello
+  tag: "latest" # є також тег "plain-text"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# Кастомні labels, додаються до всіх ресурсів
+labels:
+  team: devops
+  environment: dev
+
+# Додаткові labels тільки для подів
+podLabels:
+  tier: frontend
+
+deploymentAnnotations: {}
+podAnnotations: {}
+
+# Контейнер
+container:
+  name: hello
+  port: 80
+
+env: []
+# - name: EXAMPLE_VAR
+#   value: "example"
+
+# Service
+service:
+  type: ClusterIP # ClusterIP | NodePort | LoadBalancer
+  port: 80
+  nodePort: "" # використовується тільки при type: NodePort
+  annotations: {}
+
+# Ingress (за замовчуванням вимкнено)
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  host: hello.local
+  path: /
+  pathType: Prefix
+
+# Ресурси
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 3
+  periodSeconds: 5
+
+# Планування подів
+nodeSelector: {}
+tolerations: []
+affinity: {}

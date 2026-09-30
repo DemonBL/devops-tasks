@@ -1,0 +1,18 @@
+# Ключі та креденшли
+*.pem
+*.key
+.aws/
+*.pkrvars.hcl
+
+# Packer
+packer_cache/
+crash.log
+build.log
+
+# Ansible
+*.retry
+
+# IDE / OS
+.vscode/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,11 @@
+- name: Apply OS hardening
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+  roles:
+    - devsec.hardening.os_hardening
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
